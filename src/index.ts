@@ -1,10 +1,13 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 
 import collect from './routes/collect';
 
 const PORT = 8080;
 
 const app = express();
+
+app.use(bodyParser.json());
 
 app.use('/collect', collect);
 
