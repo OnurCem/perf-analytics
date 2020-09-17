@@ -4,9 +4,10 @@ const app = express();
 const PORT = 8080;
 
 app.get('/', (req, res) => {
-    res.send('Hello world!');
+  res.send('Hello world!');
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running at ${PORT} port`);
+  // eslint-disable-next-line no-console
+  console.log(`Server is running at ${PORT} port`);
 });
