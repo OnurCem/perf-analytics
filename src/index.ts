@@ -1,11 +1,12 @@
 import express from 'express';
 
-const app = express();
+import collect from './routes/collect';
+
 const PORT = 8080;
 
-app.get('/', (req, res) => {
-  res.send('Hello world!');
-});
+const app = express();
+
+app.use('/collect', collect);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
