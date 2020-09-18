@@ -8,4 +8,4 @@ data posted from client-side libraries and provides
 time specific filtered data to dashboard.
 
 - **JS library:** [perf-analytics.js](https://github.com/OnurCem/perf-analytics.js)
-- **Dashboard:** perf-analytics.dashboard
+- **Dashboard:** [perf-analytics.dashboard](https://github.com/OnurCem/perf-analytics.dashboard)
