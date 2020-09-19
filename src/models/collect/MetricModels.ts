@@ -4,3 +4,11 @@ export interface CollectMetricRequestModel {
   measureTime: string;
   resourceName: string;
 }
+
+export interface MetricQueryResultModel {
+  _id: string;
+  values: {
+    duration: number;
+    measureTime: string;
+  }[];
+}

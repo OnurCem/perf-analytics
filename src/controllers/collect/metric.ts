@@ -1,26 +1,46 @@
 import { Request, Response } from 'express';
 
-import { CollectMetricRequestModel } from '../../models/collect/MetricModels';
+import { CollectMetricRequestModel, MetricQueryResultModel } from '../../models/collect/MetricModels';
 import { getDB } from '../../utils/db';
 import { MINS_TO_MS_FACTOR } from '../../constants/dateConstants';
 
 export const getMetric = (req: Request, res: Response): void => {
+  const { startDate, endDate } = req.query as { startDate: string; endDate: string };
   const currentDate = new Date();
+
+  const dateQuery =
+    startDate && endDate
+      ? { $gte: new Date(startDate), $lte: new Date(endDate) }
+      : { $gte: new Date(currentDate.getTime() - 30 * MINS_TO_MS_FACTOR), $lte: currentDate };
 
   getDB()
     ?.collection('metrics')
-    .find({
-      measureTime: {
-        $gte: new Date(currentDate.getTime() - 30 * MINS_TO_MS_FACTOR),
-        $lt: currentDate,
+    .aggregate([
+      {
+        $match: {
+          measureTime: dateQuery,
+        },
       },
-    })
+      {
+        $group: {
+          _id: '$metricName',
+          values: {
+            $push: {
+              duration: '$duration',
+              measureTime: '$measureTime',
+            },
+          },
+        },
+      },
+    ])
     .toArray((error, result) => {
       if (!error) {
-        // eslint-disable-next-line no-console
-        console.log(result);
+        const metrics = result.map(({ _id, values }: MetricQueryResultModel) => ({
+          name: _id,
+          values,
+        }));
 
-        res.json({ success: true, metrics: result });
+        res.json({ success: true, metrics });
       } else {
         // eslint-disable-next-line no-console
         console.error(error);
@@ -41,11 +61,8 @@ export const postMetric = (req: Request, res: Response): void => {
 
     getDB()
       ?.collection('metrics')
-      .insertMany(mappedMetrics, (error, result) => {
+      .insertMany(mappedMetrics, (error) => {
         if (!error) {
-          // eslint-disable-next-line no-console
-          console.log(result);
-
           res.json({ success: true });
         } else {
           // eslint-disable-next-line no-console
