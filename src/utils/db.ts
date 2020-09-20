@@ -1,6 +1,6 @@
 import { Db, MongoClient } from 'mongodb';
 
-const CONNECTION_URL = 'mongodb://localhost:27017';
+const CONNECTION_URL = process.env.DB_CONNECTION_URL || 'mongodb://localhost:27017';
 const DB_NAME = 'perfanalytics';
 
 let db: Db;
