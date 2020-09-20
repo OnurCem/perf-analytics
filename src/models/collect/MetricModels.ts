@@ -2,7 +2,7 @@ export interface CollectMetricRequestModel {
   metricName: string;
   duration: number;
   measureTime: string;
-  resourceName: string;
+  resourceName?: string;
 }
 
 export interface MetricQueryResultModel {

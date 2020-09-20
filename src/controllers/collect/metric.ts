@@ -28,6 +28,7 @@ export const getMetric = (req: Request, res: Response): void => {
             $push: {
               duration: '$duration',
               measureTime: '$measureTime',
+              resourceName: '$resourceName',
             },
           },
         },
