@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 
 import collect from './routes/collect';
 
-const PORT = 8080;
+const PORT = process.env.API_PORT || 8080;
 
 const app = express();
 
