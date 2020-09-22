@@ -13,42 +13,48 @@ export const getMetric = (req: Request, res: Response): void => {
       ? { $gte: new Date(startDate), $lte: new Date(endDate) }
       : { $gte: new Date(currentDate.getTime() - 30 * MINS_TO_MS_FACTOR), $lte: currentDate };
 
-  getDB()
-    ?.collection('metrics')
-    .aggregate([
-      {
-        $match: {
-          measureTime: dateQuery,
-        },
-      },
-      {
-        $group: {
-          _id: '$metricName',
-          values: {
-            $push: {
-              duration: '$duration',
-              measureTime: '$measureTime',
-              resourceName: '$resourceName',
+  getDB().then(
+    (db) => {
+      db.collection('metrics')
+        .aggregate([
+          {
+            $match: {
+              measureTime: dateQuery,
             },
           },
-        },
-      },
-    ])
-    .toArray((error, result) => {
-      if (!error) {
-        const metrics = result.map(({ _id, values }: MetricQueryResultModel) => ({
-          name: _id,
-          values,
-        }));
+          {
+            $group: {
+              _id: '$metricName',
+              values: {
+                $push: {
+                  duration: '$duration',
+                  measureTime: '$measureTime',
+                  resourceName: '$resourceName',
+                },
+              },
+            },
+          },
+        ])
+        .toArray((error, result) => {
+          if (!error) {
+            const metrics = result.map(({ _id, values }: MetricQueryResultModel) => ({
+              name: _id,
+              values,
+            }));
 
-        res.json({ success: true, metrics });
-      } else {
-        // eslint-disable-next-line no-console
-        console.error(error);
+            res.json({ success: true, metrics });
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(error);
 
-        res.status(500).json({ success: false });
-      }
-    });
+            res.status(500).json({ success: false });
+          }
+        });
+    },
+    () => {
+      res.status(500).json({ success: false });
+    }
+  );
 };
 
 export const postMetric = (req: Request, res: Response): void => {
@@ -60,17 +66,22 @@ export const postMetric = (req: Request, res: Response): void => {
       measureTime: new Date(metricData.measureTime),
     }));
 
-    getDB()
-      ?.collection('metrics')
-      .insertMany(mappedMetrics, (error) => {
-        if (!error) {
-          res.json({ success: true });
-        } else {
-          // eslint-disable-next-line no-console
-          console.error(error);
+    getDB().then(
+      (db) => {
+        db.collection('metrics').insertMany(mappedMetrics, (error) => {
+          if (!error) {
+            res.json({ success: true });
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(error);
 
-          res.status(500).json({ success: false });
-        }
-      });
+            res.status(500).json({ success: false });
+          }
+        });
+      },
+      () => {
+        res.status(500).json({ success: false });
+      }
+    );
   }
 };

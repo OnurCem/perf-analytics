@@ -14,7 +14,11 @@ app.use(bodyParser.json());
 
 app.use('/collect', collect);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is running at ${PORT} port`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server is running at ${PORT} port`);
+  });
+}
+
+export default app;
